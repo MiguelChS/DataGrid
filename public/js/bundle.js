@@ -21767,6 +21767,7 @@
 	exports.switchPaint = switchPaint;
 	exports.cambiar = cambiar;
 	exports.setMatriz = setMatriz;
+	exports.setMatrizResult = setMatrizResult;
 	
 	var _Dispatcher = __webpack_require__(178);
 	
@@ -21791,11 +21792,14 @@
 	
 	function setMatriz(data) {
 	    _Dispatcher2.default.dispatch({
-	        type: "RESULT_MATRIZ",
+	        type: "BODY_PINTAR",
 	        data: data
 	    });
+	}
+	
+	function setMatrizResult(data) {
 	    _Dispatcher2.default.dispatch({
-	        type: "BODY_PINTAR",
+	        type: "RESULT_MATRIZ",
 	        data: data
 	    });
 	}
@@ -22288,6 +22292,12 @@
 	
 	var _rowBodyGrafic2 = _interopRequireDefault(_rowBodyGrafic);
 	
+	var _Actions = __webpack_require__(177);
+	
+	var Action = _interopRequireWildcard(_Actions);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22334,14 +22344,21 @@
 	            });
 	
 	            _storeBodyGrafic2.default.on("pintarColumna", function (data) {
-	                if (!_this2.pintar.pintar || !_this2.pintar.fila) return;
-	                for (var item in _this2.refs[_this2.pintar.fila].refs) {
-	                    var colum = _this2.refs[_this2.pintar.fila].refs[item];
+	                if (!_this2.pintar.pintar || _this2.pintar.fila == null) return;
+	                var fila = _this2.pintar.fila;
+	                for (var item in _this2.refs[fila].refs) {
+	                    var colum = _this2.refs[fila].refs[item];
 	                    if (colum.refs[data.y] != undefined) {
 	                        var style = {
 	                            backgroundColor: _this2.state.color.color
 	                        };
-	                        colum.refs[data.y].setState({ style: style });
+	                        colum.refs[data.y].setState({ style: style }, function () {
+	                            Action.setMatrizResult({
+	                                x: fila,
+	                                y: data.y,
+	                                value: data.value
+	                            });
+	                        });
 	                        break;
 	                    }
 	                }
@@ -23125,6 +23142,7 @@
 	        key: 'setMatrizSeleccion',
 	        value: function setMatrizSeleccion(data) {
 	            this.state.semanaMatriz[data["x"]][data["y"]] = data["value"];
+	            console.log(this.state.semanaMatriz);
 	        }
 	    }, {
 	        key: 'handleAction',

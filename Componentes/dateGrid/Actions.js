@@ -19,11 +19,14 @@ export function cambiar(color) {
 
 export function setMatriz(data) {
     Dispatcher.dispatch({
-        type:"RESULT_MATRIZ",
+        type:"BODY_PINTAR",
         data:data
     });
+}
+
+export function setMatrizResult(data) {
     Dispatcher.dispatch({
-        type:"BODY_PINTAR",
+        type:"RESULT_MATRIZ",
         data:data
     });
 }

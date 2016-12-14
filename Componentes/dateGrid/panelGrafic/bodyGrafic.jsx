@@ -4,6 +4,7 @@
 import React from 'react';
 import Store from '../store/storeBodyGrafic.js';
 import Row from '../panelGrafic/rowBodyGrafic.jsx';
+import * as Action from '../Actions.js';
 
 export default class BodyGrafic extends React.Component{
     constructor(props){
@@ -29,20 +30,28 @@ export default class BodyGrafic extends React.Component{
         });
 
         Store.on("pintarColumna",(data)=>{
-            if(!this.pintar.pintar || !this.pintar.fila) return;
-            for(var item in this.refs[this.pintar.fila].refs){
-                var colum = this.refs[this.pintar.fila].refs[item];
+            if(!this.pintar.pintar || this.pintar.fila == null) return;
+            var fila =  this.pintar.fila;
+            for(var item in this.refs[fila].refs){
+                var colum = this.refs[fila].refs[item];
                 if(colum.refs[data.y] != undefined){
                     var style = {
                         backgroundColor:this.state.color.color
                     };
-                    colum.refs[data.y].setState({style});
+                    colum.refs[data.y].setState({style},function () {
+                        Action.setMatrizResult({
+                            x:fila,
+                            y:data.y,
+                            value:data.value
+                        });
+                    });
                     break;
                 }
             }
         });
 
     }
+
     render(){
         var dias = ["Lunes","Martes","Miercoles","Jueves","Viernes","Sabado","Domingo"];
         var semana=[];

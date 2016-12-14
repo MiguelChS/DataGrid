@@ -30,6 +30,7 @@ class StoreResult extends EventEmitter{
 
     setMatrizSeleccion(data){
         this.state.semanaMatriz[data["x"]][data["y"]] = data["value"];
+        console.log(this.state.semanaMatriz);
     }
 
     handleAction(action){
