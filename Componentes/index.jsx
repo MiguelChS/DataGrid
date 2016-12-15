@@ -4,7 +4,7 @@ import DateGrid from './dateGrid/dateGrid.jsx';
 class index extends React.Component{
 
     render(){
-        const color = [{
+        const Horas = [{
             label:"Horas",
             value:1,
             color:"red",
@@ -14,7 +14,7 @@ class index extends React.Component{
             color:"blue"
         }];
         return(
-            <DateGrid TipoColores={color}/>
+            <DateGrid Horarios={Horas}/>
         )
     }
 };

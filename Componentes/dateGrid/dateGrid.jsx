@@ -9,9 +9,9 @@ export default class dateGrid extends React.Component{
     render(){
         return(
             <div className="DateGrafic">
-                <PanelControl TipoColores={this.props.TipoColores}/>
+                <PanelControl TipoColores={this.props.Horarios}/>
                 <PanelGrafic/>
-                <PanelResult/>
+                <PanelResult Horarios={this.props.Horarios}/>
             </div>
         )
     }

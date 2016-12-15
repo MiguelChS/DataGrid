@@ -21468,7 +21468,7 @@
 	    _createClass(index, [{
 	        key: 'render',
 	        value: function render() {
-	            var color = [{
+	            var Horas = [{
 	                label: "Horas",
 	                value: 1,
 	                color: "red"
@@ -21477,7 +21477,7 @@
 	                value: 2,
 	                color: "blue"
 	            }];
-	            return _react2.default.createElement(_dateGrid2.default, { TipoColores: color });
+	            return _react2.default.createElement(_dateGrid2.default, { Horarios: Horas });
 	        }
 	    }]);
 	
@@ -21542,9 +21542,9 @@
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'DateGrafic' },
-	                _react2.default.createElement(_panelControl2.default, { TipoColores: this.props.TipoColores }),
+	                _react2.default.createElement(_panelControl2.default, { TipoColores: this.props.Horarios }),
 	                _react2.default.createElement(_panelGrafic2.default, null),
-	                _react2.default.createElement(_PanelResult2.default, null)
+	                _react2.default.createElement(_PanelResult2.default, { Horarios: this.props.Horarios })
 	            );
 	        }
 	    }]);
@@ -23024,6 +23024,10 @@
 	
 	var _storeResult2 = _interopRequireDefault(_storeResult);
 	
+	var _Result = __webpack_require__(192);
+	
+	var _Result2 = _interopRequireDefault(_Result);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23048,25 +23052,73 @@
 	    }
 	
 	    _createClass(PanelResult, [{
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            var _this2 = this;
+	
+	            _storeResult2.default.on("update", function () {
+	                _this2.setState(_storeResult2.default.getState(), function () {
+	                    this.generarHorarios();
+	                });
+	            });
+	        }
+	    }, {
+	        key: 'generarHorarios',
+	        value: function generarHorarios() {
+	            var AuxHorario = [];
+	            for (var x in this.state.semanaMatriz) {
+	                var ultimovalor = 0;
+	                for (var y in this.state.semanaMatriz[x]) {
+	                    var valor = this.state.semanaMatriz[x][y];
+	                    //si el valor es 0 significa que no se pinto nada
+	                    if (valor != 0) {
+	                        if (ultimovalor == 0) {
+	                            //significa que ya se tiene que agregar un horario nuevo
+	                            AuxHorario.push({
+	                                row: x,
+	                                ini: y,
+	                                fin: y,
+	                                value: valor
+	                            });
+	                        } else {
+	                            // si el valor que se siguen siendo el mismo valor es que sigue con el mismo valor y modificamos el ultimo AuxHorario que se agrego
+	                            if (ultimovalor == valor) {
+	                                var ultimoAgregado = AuxHorario.length - 1;
+	                                AuxHorario[ultimoAgregado].fin = y;
+	                            } else {
+	                                //en caso contrario significa que se ahora se pinto con otro horario
+	                                AuxHorario.push({
+	                                    row: x,
+	                                    ini: y,
+	                                    fin: y,
+	                                    value: valor
+	                                });
+	                            }
+	                        }
+	                        //volvemos a cargar el ultimo valor que fue evaluado
+	                        ultimovalor = valor;
+	                    }
+	                }
+	            }
+	
+	            console.log(AuxHorario);
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var result = [];
+	            for (var i = 0; i < this.props.Horarios.length; i++) {
+	                var horario = this.props.Horarios[i];
+	                var sinBorde = false;
+	                if (i == this.props.Horarios.length - 1) {
+	                    sinBorde = true;
+	                }
+	                result.push(_react2.default.createElement(_Result2.default, { ref: horario.value, key: i, sinBorde: sinBorde, label: horario.label }));
+	            }
 	            return _react2.default.createElement(
 	                'div',
-	                { className: 'DateGrafic-Result' },
-	                _react2.default.createElement(
-	                    'div',
-	                    null,
-	                    _react2.default.createElement(
-	                        'p',
-	                        null,
-	                        'Lunes a viernes 17:30 hs a 21:00 hs'
-	                    ),
-	                    _react2.default.createElement(
-	                        'span',
-	                        null,
-	                        '\xD7'
-	                    )
-	                )
+	                null,
+	                result
 	            );
 	        }
 	    }]);
@@ -23130,6 +23182,7 @@
 	        _this.state = {
 	            semanaMatriz: _this.generarMatriz()
 	        };
+	        _this.setMaxListeners(0);
 	        return _this;
 	    }
 	
@@ -23142,7 +23195,7 @@
 	        key: 'setMatrizSeleccion',
 	        value: function setMatrizSeleccion(data) {
 	            this.state.semanaMatriz[data["x"]][data["y"]] = data["value"];
-	            console.log(this.state.semanaMatriz);
+	            this.emit("update");
 	        }
 	    }, {
 	        key: 'handleAction',
@@ -23163,6 +23216,87 @@
 	_Dispatcher2.default.register(storeResult.handleAction.bind(storeResult));
 	
 	exports.default = storeResult;
+
+/***/ },
+/* 192 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = undefined;
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Result = function (_React$Component) {
+	    _inherits(Result, _React$Component);
+	
+	    function Result() {
+	        _classCallCheck(this, Result);
+	
+	        var _this = _possibleConstructorReturn(this, (Result.__proto__ || Object.getPrototypeOf(Result)).call(this));
+	
+	        _this.state = {
+	            error: "",
+	            horario: []
+	        };
+	
+	        return _this;
+	    }
+	
+	    _createClass(Result, [{
+	        key: "render",
+	        value: function render() {
+	            var styleClass = "DateGrafic-Result " + (this.props.sinBorde ? "sinBorderBottom" : "");
+	            return _react2.default.createElement(
+	                "div",
+	                { className: styleClass },
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "header" },
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "pull-left text-bold" },
+	                        this.props.label
+	                    ),
+	                    _react2.default.createElement(
+	                        "div",
+	                        { className: "pull-right" },
+	                        this.state.error
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    "div",
+	                    { className: "body" },
+	                    this.state.horario
+	                )
+	            );
+	        }
+	    }]);
+	
+	    return Result;
+	}(_react2.default.Component);
+	
+	/*<div>
+	 <p>Lunes a viernes 17:30 hs a 21:00 hs</p><span>&times;</span>
+	 </div>*/
+	
+	
+	exports.default = Result;
 
 /***/ }
 /******/ ]);

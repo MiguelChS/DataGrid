@@ -22,6 +22,7 @@ class StoreResult extends EventEmitter{
         this.state = {
             semanaMatriz : this.generarMatriz()
         }
+        this.setMaxListeners(0);
     }
 
     getState(){
@@ -30,7 +31,7 @@ class StoreResult extends EventEmitter{
 
     setMatrizSeleccion(data){
         this.state.semanaMatriz[data["x"]][data["y"]] = data["value"];
-        console.log(this.state.semanaMatriz);
+        this.emit("update");
     }
 
     handleAction(action){
